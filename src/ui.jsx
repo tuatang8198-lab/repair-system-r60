@@ -68,7 +68,7 @@ function TopBar({ user, onHome, onAdmin, onLogout }) {
     <div className="topbar">
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "14px 24px", display: "flex", alignItems: "center", gap: 16 }}>
         <button className="brand" onClick={onHome} style={{ cursor: "pointer" }}>
-          <div className="brand-mark"></div>
+          <div className="brand-mark"><img src="assets/logo.png" alt="Logo"/></div>
           <div style={{ textAlign: "left" }}>
             <div className="brand-title">ระบบแจ้งซ่อมคอมพิวเตอร์</div>
             <div className="brand-sub">โรงเรียนราชประชานุเคราะห์ 60 · จังหวัดเชียงใหม่</div>

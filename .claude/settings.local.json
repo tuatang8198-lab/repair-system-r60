@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(mkdir -p /tmp/design_extract)",
+      "Read(//tmp/**)",
+      "Bash(cp \"C:\\\\Users\\\\SFS-RTFV\\\\.claude\\\\projects\\\\C--Users-SFS-RTFV-Downloads-------------\\\\13b38618-607d-44d9-9b0b-2843fc50389f\\\\tool-results\\\\webfetch-1778825844428-rcnpzo.bin\" ./design.tar.gz)",
+      "Bash(tar -xzf design.tar.gz)",
+      "Bash(cp -r /tmp/design_extract/machanicalcomputer /c/Users/SFS-RTFV/AppData/Local/Temp/design_mc)",
+      "Read(//c/Users/SFS-RTFV/AppData/Local/Temp/**)",
+      "Bash(cp \"/c/Users/SFS-RTFV/AppData/Local/Temp/design_mc/project/index.html\" \"/c/Users/SFS-RTFV/Downloads/ระบบแจ้งซ่อม/index.html\")",
+      "Bash(cp /c/Users/SFS-RTFV/AppData/Local/Temp/design_mc/project/src/*.jsx \"/c/Users/SFS-RTFV/Downloads/ระบบแจ้งซ่อม/src/\")",
+      "Bash(python -m http.server 8000)",
+      "Bash(git config *)",
+      "Bash(grep -E \"\\\\.\\(png|jpg|jpeg|webp\\)$\")"
+    ]
+  }
+}
