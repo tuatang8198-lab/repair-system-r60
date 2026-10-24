@@ -4,16 +4,22 @@
   "lessonsInPrompt": 15,
   "filePrompt": "Read the file {promptFile} and carry out the task it describes. Reply with the final result only.",
   "outputContract": "Finish with exactly these sections:\n## Result\n<the answer, or what you changed and where (file:line)>\n## Status: done | blocked | partial\n## Notes for the caller\n<anything that went wrong, assumptions made, or what to do next; keep it short>",
-
   "roles": {
     "advisor": {
       "write": false,
       "timeoutSec": 1200,
       "instructions": "You are the ADVISOR: a senior engineer consulted by a cheaper main agent. Think hard, read whatever files you need, and give a clear recommendation, plan, review or diagnosis. Do NOT edit files. Be concrete: name files, functions and the exact steps. If the brief is missing something you need, say so under Notes.",
       "chain": [
-        { "backend": "codex" },
-        { "backend": "claude", "model": "opus" },
-        { "backend": "gemini" }
+        {
+          "backend": "codex"
+        },
+        {
+          "backend": "claude",
+          "model": "opus"
+        },
+        {
+          "backend": "gemini"
+        }
       ]
     },
     "worker": {
@@ -21,11 +27,54 @@
       "timeoutSec": 900,
       "instructions": "You are a WORKER: do exactly the task in the brief, nothing more. Stay inside the files and scope it names. Do not refactor, rename or 'improve' anything else. Run the checks the brief lists, if any. If something blocks you, stop and report it instead of guessing.",
       "chain": [
-        { "backend": "gemini" },
-        { "backend": "qwen" },
-        { "backend": "opencode" },
-        { "backend": "copilot" },
-        { "backend": "claude", "model": "haiku" }
+        {
+          "backend": "agy",
+          "model": "gemini-3.8-flash-medium"
+        },
+        {
+          "backend": "gemini",
+          "model": "flash"
+        },
+        {
+          "backend": "gemini",
+          "model": "flash-lite"
+        },
+        {
+          "backend": "qwen"
+        },
+        {
+          "backend": "opencode"
+        },
+        {
+          "backend": "copilot"
+        },
+        {
+          "backend": "claude",
+          "model": "haiku"
+        }
+      ]
+    },
+    "worker-pro": {
+      "write": true,
+      "timeoutSec": 1200,
+      "instructions": "You are a SENIOR WORKER: do the task in the brief end to end. It is harder than a plain worker job (several files, some judgement inside the stated scope), but stay inside the scope the brief names. Run the listed checks. If something blocks you, stop and report it instead of guessing.",
+      "chain": [
+        {
+          "backend": "agy",
+          "model": "gemini-4-argon"
+        },
+        {
+          "backend": "agy",
+          "model": "gemini-3.8-flash-high"
+        },
+        {
+          "backend": "gemini",
+          "model": "pro"
+        },
+        {
+          "backend": "claude",
+          "model": "sonnet"
+        }
       ]
     },
     "fork": {
@@ -33,9 +82,16 @@
       "timeoutSec": 1500,
       "instructions": "You are a FORK: a copy of the main agent, started fresh. The brief is the main agent's handoff: its goal, what it already knows, what it already tried, and the slice of work it is handing you. Treat that context as yours and finish the slice end to end with the same judgement the main agent would use. Do not redo work the brief says is done.",
       "chain": [
-        { "backend": "claude", "model": "sonnet" },
-        { "backend": "codex" },
-        { "backend": "gemini" }
+        {
+          "backend": "claude",
+          "model": "sonnet"
+        },
+        {
+          "backend": "codex"
+        },
+        {
+          "backend": "gemini"
+        }
       ]
     },
     "retro": {
@@ -43,65 +99,155 @@
       "timeoutSec": 600,
       "instructions": "You are the RETRO reviewer. You turn one finished run into short, reusable lessons. Only keep lessons that would change how the next brief is written or how the next run behaves.",
       "chain": [
-        { "backend": "claude", "model": "opus" },
-        { "backend": "codex" },
-        { "backend": "gemini" }
+        {
+          "backend": "claude",
+          "model": "opus"
+        },
+        {
+          "backend": "codex"
+        },
+        {
+          "backend": "gemini"
+        }
       ]
     }
   },
-
   "backends": {
     "claude": {
       "bin": "claude",
       "install": "npm i -g @anthropic-ai/claude-code",
       "login": "claude  (then /login)",
-      "args": ["-p", "--output-format", "text"],
-      "modelArgs": ["--model", "{model}"],
-      "writeArgs": ["--permission-mode", "acceptEdits"]
+      "args": [
+        "-p",
+        "--output-format",
+        "text"
+      ],
+      "modelArgs": [
+        "--model",
+        "{model}"
+      ],
+      "writeArgs": [
+        "--permission-mode",
+        "acceptEdits"
+      ]
     },
     "codex": {
       "bin": "codex",
       "install": "npm i -g @openai/codex",
       "login": "codex login",
-      "args": ["exec", "--skip-git-repo-check"],
-      "modelArgs": ["-m", "{model}"],
-      "readArgs": ["--sandbox", "read-only"],
-      "writeArgs": ["--full-auto"],
-      "tailArgs": ["-"]
+      "args": [
+        "exec",
+        "--skip-git-repo-check"
+      ],
+      "modelArgs": [
+        "-m",
+        "{model}"
+      ],
+      "readArgs": [
+        "--sandbox",
+        "read-only"
+      ],
+      "writeArgs": [
+        "--full-auto"
+      ],
+      "tailArgs": [
+        "-"
+      ]
     },
     "gemini": {
       "bin": "gemini",
       "install": "npm i -g @google/gemini-cli",
       "login": "gemini  (choose 'Login with Google' — free tier)",
-      "args": ["-p", "Follow the instructions given on stdin."],
-      "modelArgs": ["-m", "{model}"],
-      "writeArgs": ["--approval-mode", "auto_edit"]
+      "args": [
+        "-p",
+        "Follow the instructions given on stdin."
+      ],
+      "modelArgs": [
+        "-m",
+        "{model}"
+      ],
+      "writeArgs": [
+        "--approval-mode",
+        "auto_edit"
+      ],
+      "models": "aliases: pro, flash (→ newest Flash your account has, e.g. gemini-3.8-flash), flash-lite"
+    },
+    "agy": {
+      "bin": "agy",
+      "install": {
+        "win32": "curl -fsSL https://antigravity.google/cli/install.cmd -o install.cmd && install.cmd && del install.cmd",
+        "default": "curl -fsSL https://antigravity.google/cli/install.sh | bash"
+      },
+      "login": "agy  (Google Sign-In opens in the browser; uses your Gemini/AI Pro plan)",
+      "models": "run `agy models` to see the exact slugs your plan has",
+      "stdin": false,
+      "args": [
+        "-p",
+        "{prompt}",
+        "--print-timeout",
+        "20m"
+      ],
+      "modelArgs": [
+        "--model",
+        "{model}"
+      ],
+      "readArgs": [
+        "--mode",
+        "plan"
+      ],
+      "writeArgs": [
+        "--dangerously-skip-permissions"
+      ]
     },
     "qwen": {
       "bin": "qwen",
       "install": "npm i -g @qwen-code/qwen-code",
       "login": "qwen  (choose Qwen OAuth — free tier)",
-      "args": ["-p", "Follow the instructions given on stdin."],
-      "modelArgs": ["-m", "{model}"],
-      "writeArgs": ["--approval-mode", "auto_edit"]
+      "args": [
+        "-p",
+        "Follow the instructions given on stdin."
+      ],
+      "modelArgs": [
+        "-m",
+        "{model}"
+      ],
+      "writeArgs": [
+        "--approval-mode",
+        "auto_edit"
+      ]
     },
     "opencode": {
       "bin": "opencode",
       "install": "npm i -g opencode-ai",
       "login": "opencode auth login",
       "stdin": false,
-      "args": ["run"],
-      "modelArgs": ["-m", "{model}"],
-      "tailArgs": ["{prompt}"]
+      "args": [
+        "run"
+      ],
+      "modelArgs": [
+        "-m",
+        "{model}"
+      ],
+      "tailArgs": [
+        "{prompt}"
+      ]
     },
     "copilot": {
       "bin": "copilot",
       "install": "npm i -g @github/copilot",
       "login": "copilot  (then /login)",
       "stdin": false,
-      "args": ["-p", "{prompt}"],
-      "modelArgs": ["--model", "{model}"],
-      "writeArgs": ["--allow-all-tools"]
+      "args": [
+        "-p",
+        "{prompt}"
+      ],
+      "modelArgs": [
+        "--model",
+        "{model}"
+      ],
+      "writeArgs": [
+        "--allow-all-tools"
+      ]
     }
   }
 }

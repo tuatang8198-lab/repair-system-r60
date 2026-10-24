@@ -27,8 +27,9 @@ const sh = (cmd) => spawnSync(cmd, { stdio: 'inherit', shell: true }).status ===
 if (flag === '--install') {
   for (const [name, b] of picked) {
     if (onPath(b.bin)) { console.log(`✓ ${name} already installed`); continue; }
-    console.log(`→ ${name}: ${b.install}`);
-    if (!sh(b.install)) console.log(`✗ ${name} failed to install — try the command above by hand`);
+    const cmd = typeof b.install === 'string' ? b.install : (b.install[process.platform] || b.install.default);
+    console.log(`→ ${name}: ${cmd}`);
+    if (!sh(cmd)) console.log(`✗ ${name} failed to install — try the command above by hand`);
   }
 } else if (flag === '--login') {
   if (names.length !== 1) { console.error('usage: --login <backend>'); process.exit(2); }
@@ -43,6 +44,7 @@ if (flag === '--install') {
 console.log('\nBackend   installed  login');
 for (const [name, b] of picked) {
   console.log(`${name.padEnd(9)} ${onPath(b.bin) ? 'yes      ' : 'no       '}  ${b.login}`);
+  if (b.models) console.log(`${''.padEnd(21)}models: ${b.models}`);
 }
 console.log('\nLog in each installed CLI once:  node scripts/delegate-setup.mjs --login <backend>');
 console.log('Then check:                      node scripts/delegate.mjs doctor');

@@ -8,7 +8,7 @@ Entry: `index.html`; screens in `src/screens-*.jsx`; Supabase config in `src/con
 The main session runs on an ordinary model. BEFORE doing a large or self-contained task yourself, hand it off:
 
 - **UNSURE / HIGH-STAKES DECISION →** `delegate-advisor` subagent (strong model, read-only).
-- **MECHANICAL, FULLY SPECIFIED WORK →** `delegate-worker` subagent (small / free-tier model).
+- **MECHANICAL, FULLY SPECIFIED WORK →** `delegate-worker` subagent (role `worker`: Gemini 3.8 Flash / flash-lite; role `worker-pro`: Gemini 4 Argon).
 - **A WHOLE SLICE OF YOUR OWN WORK →** `delegate-fork` subagent (a copy of you, with a handoff file).
 - **A RUN WENT WRONG →** `node scripts/delegate.mjs retro <run-id> --note "..."` so the lesson sticks.
 

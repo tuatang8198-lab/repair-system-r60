@@ -271,7 +271,7 @@ function cmdDoctor(conf) {
   }
   console.log('\nRole chains (first installed+working backend wins):');
   for (const [role, r] of Object.entries(conf.roles)) {
-    console.log(`  ${role.padEnd(8)} ${r.chain.map((c) => c.backend + (c.model ? `/${c.model}` : '')).join(' → ')}`);
+    console.log(`  ${role.padEnd(10)} ${r.chain.map((c) => c.backend + (c.model ? `/${c.model}` : '')).join(' → ')}`);
   }
 }
 

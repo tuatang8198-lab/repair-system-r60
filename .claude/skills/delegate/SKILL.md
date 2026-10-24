@@ -1,6 +1,6 @@
 ---
 name: delegate
-description: Hand work to other AI CLIs (codex, gemini, qwen, opencode, copilot, claude) through scripts/delegate.mjs so the main context stays small and free tiers do the bulk work. Use when a task is self-contained, when you want a stronger model's opinion, when mechanical work can go to a cheap model, or when the user says delegate / advisor / worker / fork / retro / handoff.
+description: Hand work to other AI CLIs (codex, gemini, Antigravity agy, qwen, opencode, copilot, claude) through scripts/delegate.mjs so the main context stays small and free tiers do the bulk work. Use when a task is self-contained, when you want a stronger model's opinion, when mechanical work can go to a cheap model, or when the user says delegate / advisor / worker / fork / retro / handoff.
 ---
 
 # Delegate harness
@@ -14,10 +14,12 @@ are files under `.claude/handoff/<run-id>/`, so nothing piles up in your context
 | Role | Model tier | Edits files | Chain (first installed + working wins) | Use for |
 |---|---|---|---|---|
 | `advisor` | strong | no | codex → claude opus → gemini | plans, design calls, reviews, hard bugs |
-| `worker` | small / free | yes | gemini → qwen → opencode → copilot → claude haiku | mechanical, fully specified jobs |
+| `worker` | small / free | yes | agy Gemini 3.8 Flash → gemini flash → gemini flash-lite → qwen → opencode → copilot → claude haiku | mechanical, fully specified jobs |
+| `worker-pro` | strong subordinate | yes | agy Gemini 4 Argon → agy 3.8 Flash high → gemini pro → claude sonnet | harder grunt work across several files |
 | `fork` | same as you | yes | claude sonnet → codex → gemini | a whole slice of your own work, with your context |
 | `retro` | strong | no | claude opus → codex → gemini | turns a finished run into lessons |
 
+Gemini 4 Argon and 3.8 Flash are reached through the Antigravity CLI (`agy`), not the Gemini chat app, which has no command line; check slugs with `agy models`.
 Chains and CLI flags live in `.claude/delegate/config.json`. A backend that is not
 installed is skipped; one that hits a rate limit / quota / login error falls through
 to the next.
