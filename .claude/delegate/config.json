@@ -1,0 +1,107 @@
+{
+  "timeoutSec": 900,
+  "maxPrintChars": 4000,
+  "lessonsInPrompt": 15,
+  "filePrompt": "Read the file {promptFile} and carry out the task it describes. Reply with the final result only.",
+  "outputContract": "Finish with exactly these sections:\n## Result\n<the answer, or what you changed and where (file:line)>\n## Status: done | blocked | partial\n## Notes for the caller\n<anything that went wrong, assumptions made, or what to do next; keep it short>",
+
+  "roles": {
+    "advisor": {
+      "write": false,
+      "timeoutSec": 1200,
+      "instructions": "You are the ADVISOR: a senior engineer consulted by a cheaper main agent. Think hard, read whatever files you need, and give a clear recommendation, plan, review or diagnosis. Do NOT edit files. Be concrete: name files, functions and the exact steps. If the brief is missing something you need, say so under Notes.",
+      "chain": [
+        { "backend": "codex" },
+        { "backend": "claude", "model": "opus" },
+        { "backend": "gemini" }
+      ]
+    },
+    "worker": {
+      "write": true,
+      "timeoutSec": 900,
+      "instructions": "You are a WORKER: do exactly the task in the brief, nothing more. Stay inside the files and scope it names. Do not refactor, rename or 'improve' anything else. Run the checks the brief lists, if any. If something blocks you, stop and report it instead of guessing.",
+      "chain": [
+        { "backend": "gemini" },
+        { "backend": "qwen" },
+        { "backend": "opencode" },
+        { "backend": "copilot" },
+        { "backend": "claude", "model": "haiku" }
+      ]
+    },
+    "fork": {
+      "write": true,
+      "timeoutSec": 1500,
+      "instructions": "You are a FORK: a copy of the main agent, started fresh. The brief is the main agent's handoff: its goal, what it already knows, what it already tried, and the slice of work it is handing you. Treat that context as yours and finish the slice end to end with the same judgement the main agent would use. Do not redo work the brief says is done.",
+      "chain": [
+        { "backend": "claude", "model": "sonnet" },
+        { "backend": "codex" },
+        { "backend": "gemini" }
+      ]
+    },
+    "retro": {
+      "write": false,
+      "timeoutSec": 600,
+      "instructions": "You are the RETRO reviewer. You turn one finished run into short, reusable lessons. Only keep lessons that would change how the next brief is written or how the next run behaves.",
+      "chain": [
+        { "backend": "claude", "model": "opus" },
+        { "backend": "codex" },
+        { "backend": "gemini" }
+      ]
+    }
+  },
+
+  "backends": {
+    "claude": {
+      "bin": "claude",
+      "install": "npm i -g @anthropic-ai/claude-code",
+      "login": "claude  (then /login)",
+      "args": ["-p", "--output-format", "text"],
+      "modelArgs": ["--model", "{model}"],
+      "writeArgs": ["--permission-mode", "acceptEdits"]
+    },
+    "codex": {
+      "bin": "codex",
+      "install": "npm i -g @openai/codex",
+      "login": "codex login",
+      "args": ["exec", "--skip-git-repo-check"],
+      "modelArgs": ["-m", "{model}"],
+      "readArgs": ["--sandbox", "read-only"],
+      "writeArgs": ["--full-auto"],
+      "tailArgs": ["-"]
+    },
+    "gemini": {
+      "bin": "gemini",
+      "install": "npm i -g @google/gemini-cli",
+      "login": "gemini  (choose 'Login with Google' — free tier)",
+      "args": ["-p", "Follow the instructions given on stdin."],
+      "modelArgs": ["-m", "{model}"],
+      "writeArgs": ["--approval-mode", "auto_edit"]
+    },
+    "qwen": {
+      "bin": "qwen",
+      "install": "npm i -g @qwen-code/qwen-code",
+      "login": "qwen  (choose Qwen OAuth — free tier)",
+      "args": ["-p", "Follow the instructions given on stdin."],
+      "modelArgs": ["-m", "{model}"],
+      "writeArgs": ["--approval-mode", "auto_edit"]
+    },
+    "opencode": {
+      "bin": "opencode",
+      "install": "npm i -g opencode-ai",
+      "login": "opencode auth login",
+      "stdin": false,
+      "args": ["run"],
+      "modelArgs": ["-m", "{model}"],
+      "tailArgs": ["{prompt}"]
+    },
+    "copilot": {
+      "bin": "copilot",
+      "install": "npm i -g @github/copilot",
+      "login": "copilot  (then /login)",
+      "stdin": false,
+      "args": ["-p", "{prompt}"],
+      "modelArgs": ["--model", "{model}"],
+      "writeArgs": ["--allow-all-tools"]
+    }
+  }
+}

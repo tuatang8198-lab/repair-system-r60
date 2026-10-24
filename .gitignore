@@ -1,0 +1,4 @@
+# delegate harness: per-run handoff files and run log stay local
+.claude/handoff/
+.claude/delegate/runs.jsonl
+.claude/delegate/briefs/
